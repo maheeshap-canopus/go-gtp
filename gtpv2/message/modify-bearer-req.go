@@ -558,8 +558,51 @@ func (m *ModifyBearerRequest) UnmarshalBinary(b []byte) error {
 			m.AdditionalIEs = append(m.AdditionalIEs, i)
 		}
 	}
-
+	ie.ReleaseMultiParseContainer(decodedIEs)
 	return nil
+}
+
+// Reset releases any IEs and truncates slices while maintaining capacity
+func (m *ModifyBearerRequest) Reset() {
+	*m = ModifyBearerRequest{
+		Header:                                 nil,
+		MEI:                                    ie.Release(m.MEI),
+		ULI:                                    ie.Release(m.ULI),
+		ServingNetwork:                         ie.Release(m.ServingNetwork),
+		RATType:                                ie.Release(m.RATType),
+		IndicationFlags:                        ie.Release(m.IndicationFlags),
+		SenderFTEIDC:                           ie.Release(m.SenderFTEIDC),
+		AMBR:                                   ie.Release(m.AMBR),
+		DelayDownlinkPacketNotificationRequest: ie.Release(m.DelayDownlinkPacketNotificationRequest),
+		BearerContextsToBeModified:             ie.ReleaseSlice(m.BearerContextsToBeModified),
+		BearerContextsToBeRemoved:              ie.ReleaseSlice(m.BearerContextsToBeRemoved),
+		Recovery:                               ie.Release(m.Recovery),
+		UETimeZone:                             ie.Release(m.UETimeZone),
+		MMEFQCSID:                              ie.Release(m.MMEFQCSID),
+		SGWFQCSID:                              ie.Release(m.SGWFQCSID),
+		UCI:                                    ie.Release(m.UCI),
+		UELocalIPAddress:                       ie.Release(m.UELocalIPAddress),
+		UEUDPPort:                              ie.Release(m.UEUDPPort),
+		MMESGSNLDN:                             ie.Release(m.MMESGSNLDN),
+		SGWLDN:                                 ie.Release(m.SGWLDN),
+		HeNBLocalIPAddress:                     ie.Release(m.HeNBLocalIPAddress),
+		HeNBUDPPort:                            ie.Release(m.HeNBUDPPort),
+		MMESGSNIdentifier:                      ie.Release(m.MMESGSNIdentifier),
+		CNOperatorSelectionEntity:              ie.Release(m.CNOperatorSelectionEntity),
+		PresenceReportingAreaInformation:       ie.ReleaseSlice(m.PresenceReportingAreaInformation),
+		MMESGSNOverloadControlInformation:      ie.Release(m.MMESGSNOverloadControlInformation),
+		SGWOverloadControlInformation:          ie.Release(m.SGWOverloadControlInformation),
+		EPDGOverloadControlInformation:         ie.Release(m.EPDGOverloadControlInformation),
+		ServingPLMNRateControl:                 ie.Release(m.ServingPLMNRateControl),
+		MOExceptionDataCounter:                 ie.Release(m.MOExceptionDataCounter),
+		IMSI:                                   ie.Release(m.IMSI),
+		ULIForSGW:                              ie.Release(m.ULIForSGW),
+		WLANLocationInformation:                ie.Release(m.WLANLocationInformation),
+		WLANLocationTimeStamp:                  ie.Release(m.WLANLocationTimeStamp),
+		SecondaryRATUsageDataReport:            ie.ReleaseSlice(m.SecondaryRATUsageDataReport),
+		PrivateExtension:                       ie.Release(m.PrivateExtension),
+		AdditionalIEs:                          ie.ReleaseSlice(m.AdditionalIEs),
+	}
 }
 
 // MarshalLen returns the serial length in int.

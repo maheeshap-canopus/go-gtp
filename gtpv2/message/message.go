@@ -415,6 +415,8 @@ func Parse(b []byte) (Message, error) {
 // Release calls any reset/release method on the Message if defined. Messages should not be referenced after calling Release
 func Release(m Message) {
 	switch m.MessageType() {
+	case MsgTypeModifyBearerRequest:
+		m.(*ModifyBearerRequest).Reset()
 	case MsgTypeModifyBearerResponse:
 		m.(*ModifyBearerResponse).Reset()
 	}
