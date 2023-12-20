@@ -905,8 +905,82 @@ func (c *CreateSessionRequest) UnmarshalBinary(b []byte) error {
 			c.AdditionalIEs = append(c.AdditionalIEs, i)
 		}
 	}
-
+	ie.ReleaseMultiParseContainer(decodedIEs)
 	return nil
+}
+
+// Reset releases any IEs and truncates slices while maintaining capacity
+func (m *CreateSessionRequest) Reset() {
+	*m = CreateSessionRequest{
+		Header:                             nil,
+		IMSI:                               ie.Release(m.IMSI),
+		MSISDN:                             ie.Release(m.MSISDN),
+		MEI:                                ie.Release(m.MEI),
+		ULI:                                ie.Release(m.ULI),
+		ServingNetwork:                     ie.Release(m.ServingNetwork),
+		RATType:                            ie.Release(m.RATType),
+		IndicationFlags:                    ie.Release(m.IndicationFlags),
+		SenderFTEIDC:                       ie.Release(m.SenderFTEIDC),
+		PGWS5S8FTEIDC:                      ie.Release(m.PGWS5S8FTEIDC),
+		APN:                                ie.Release(m.APN),
+		SelectionMode:                      ie.Release(m.SelectionMode),
+		PDNType:                            ie.Release(m.PDNType),
+		PAA:                                ie.Release(m.PAA),
+		APNRestriction:                     ie.Release(m.APNRestriction),
+		AMBR:                               ie.Release(m.AMBR),
+		LinkedEBI:                          ie.Release(m.LinkedEBI),
+		TWMI:                               ie.Release(m.TWMI),
+		PCO:                                ie.Release(m.PCO),
+		BearerContextsToBeCreated:          ie.ReleaseSlice(m.BearerContextsToBeCreated),
+		BearerContextsToBeRemoved:          ie.ReleaseSlice(m.BearerContextsToBeRemoved),
+		TraceInformation:                   ie.Release(m.TraceInformation),
+		Recovery:                           ie.Release(m.Recovery),
+		MMEFQCSID:                          ie.Release(m.MMEFQCSID),
+		SGWFQCSID:                          ie.Release(m.SGWFQCSID),
+		EPDGFQCSID:                         ie.Release(m.EPDGFQCSID),
+		TWANFQCSID:                         ie.Release(m.TWANFQCSID),
+		UETimeZone:                         ie.Release(m.UETimeZone),
+		UCI:                                ie.Release(m.UCI),
+		ChargingCharacteristics:            ie.Release(m.ChargingCharacteristics),
+		MMESGSNLDN:                         ie.Release(m.MMESGSNLDN),
+		SGWLDN:                             ie.Release(m.SGWLDN),
+		EPDGLDN:                            ie.Release(m.EPDGLDN),
+		TWANLDN:                            ie.Release(m.TWANLDN),
+		SignallingPriorityIndication:       ie.Release(m.SignallingPriorityIndication),
+		UELocalIPAddress:                   ie.Release(m.UELocalIPAddress),
+		UEUDPPort:                          ie.Release(m.UEUDPPort),
+		APCO:                               ie.Release(m.APCO),
+		HeNBLocalIPAddress:                 ie.Release(m.HeNBLocalIPAddress),
+		HeNBUDPPort:                        ie.Release(m.HeNBUDPPort),
+		MMESGSNIdentifier:                  ie.Release(m.MMESGSNIdentifier),
+		TWANIdentifier:                     ie.Release(m.TWANIdentifier),
+		EPDGIPAddress:                      ie.Release(m.EPDGIPAddress),
+		CNOperatorSelectionEntity:          ie.Release(m.CNOperatorSelectionEntity),
+		PresenceReportingAreaInformation:   ie.ReleaseSlice(m.PresenceReportingAreaInformation),
+		MMESGSNOverloadControlInformation:  ie.Release(m.MMESGSNOverloadControlInformation),
+		SGWOverloadControlInformation:      ie.Release(m.SGWOverloadControlInformation),
+		TWANePDGOverloadControlInformation: ie.Release(m.TWANePDGOverloadControlInformation),
+		OriginationTimeStamp:               ie.Release(m.OriginationTimeStamp),
+		MaximumWaitTime:                    ie.Release(m.MaximumWaitTime),
+		WLANLocationInformation:            ie.Release(m.WLANLocationInformation),
+		WLANLocationTimeStamp:              ie.Release(m.WLANLocationTimeStamp),
+		NBIFOMContainer:                    ie.Release(m.NBIFOMContainer),
+		RemoteUEContextConnected:           ie.ReleaseSlice(m.RemoteUEContextConnected),
+		TGPPAAAServerIdentifier:            ie.Release(m.TGPPAAAServerIdentifier),
+		EPCO:                               ie.Release(m.EPCO),
+		ServingPLMNRateControl:             ie.Release(m.ServingPLMNRateControl),
+		MOExceptionDataCounter:             ie.Release(m.MOExceptionDataCounter),
+		UETCPPort:                          ie.Release(m.UETCPPort),
+		MappedUEUsageType:                  ie.Release(m.MappedUEUsageType),
+		ULIForSGW:                          ie.Release(m.ULIForSGW),
+		SGWUNodeName:                       ie.Release(m.SGWUNodeName),
+		SecondaryRATUsageDataReport:        ie.ReleaseSlice(m.SecondaryRATUsageDataReport),
+		UPFunctionSelectionIndicationFlags: ie.Release(m.UPFunctionSelectionIndicationFlags),
+		APNRateControlStatus:               ie.Release(m.APNRateControlStatus),
+		PrivateExtension:                   ie.Release(m.PrivateExtension),
+		AdditionalIEs:                      ie.ReleaseSlice(m.AdditionalIEs),
+	}
+	msgPool.releaseCreateSessionRequest(m)
 }
 
 // MarshalLen returns the serial length in int.

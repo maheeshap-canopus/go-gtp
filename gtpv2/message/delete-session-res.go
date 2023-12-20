@@ -255,8 +255,29 @@ func (d *DeleteSessionResponse) UnmarshalBinary(b []byte) error {
 			d.AdditionalIEs = append(d.AdditionalIEs, i)
 		}
 	}
-
+	ie.ReleaseMultiParseContainer(decodedIEs)
 	return nil
+}
+
+// Reset releases any IEs and truncates slices while maintaining capacity
+func (m *DeleteSessionResponse) Reset() {
+	*m = DeleteSessionResponse{
+		Header:                        nil,
+		Cause:                         ie.Release(m.Cause),
+		Recovery:                      ie.Release(m.Recovery),
+		PCO:                           ie.Release(m.PCO),
+		IndicationFlags:               ie.Release(m.IndicationFlags),
+		PGWNodeLoadControlInformation: ie.Release(m.PGWNodeLoadControlInformation),
+		PGWAPNLoadControlInformation:  ie.Release(m.PGWAPNLoadControlInformation),
+		SGWNodeLoadControlInformation: ie.Release(m.SGWNodeLoadControlInformation),
+		PGWOverloadControlInformation: ie.Release(m.PGWOverloadControlInformation),
+		SGWOverloadControlInformation: ie.Release(m.SGWOverloadControlInformation),
+		EPCO:                          ie.Release(m.EPCO),
+		APNRateControlStatus:          ie.Release(m.APNRateControlStatus),
+		PrivateExtension:              ie.Release(m.PrivateExtension),
+		AdditionalIEs:                 ie.ReleaseSlice(m.AdditionalIEs),
+	}
+	msgPool.releaseDeleteSessionResponse(m)
 }
 
 // MarshalLen returns the serial length in int.

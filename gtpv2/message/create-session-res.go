@@ -536,8 +536,51 @@ func (c *CreateSessionResponse) UnmarshalBinary(b []byte) error {
 			c.AdditionalIEs = append(c.AdditionalIEs, i)
 		}
 	}
-
+	ie.ReleaseMultiParseContainer(decodedIEs)
 	return nil
+}
+
+// Reset releases any IEs and truncates slices while maintaining capacity
+func (m *CreateSessionResponse) Reset() {
+	*m = CreateSessionResponse{
+		Header:                        nil,
+		Cause:                         ie.Release(m.Cause),
+		ChangeReportingAction:         ie.Release(m.ChangeReportingAction),
+		CSGInformationReportingAction: ie.Release(m.CSGInformationReportingAction),
+		HeNBInformationReporting:      ie.Release(m.HeNBInformationReporting),
+		SenderFTEIDC:                  ie.Release(m.SenderFTEIDC),
+		PGWS5S8FTEIDC:                 ie.Release(m.PGWS5S8FTEIDC),
+		PAA:                           ie.Release(m.PAA),
+		APNRestriction:                ie.Release(m.APNRestriction),
+		AMBR:                          ie.Release(m.AMBR),
+		EBI:                           ie.Release(m.EBI),
+		PCO:                           ie.Release(m.PCO),
+		BearerContextsCreated:         ie.ReleaseSlice(m.BearerContextsCreated),
+		BearerContextMarkedForRemoval: ie.Release(m.BearerContextMarkedForRemoval),
+		Recovery:                      ie.Release(m.Recovery),
+		ChargingGatewayName:           ie.Release(m.ChargingGatewayName),
+		ChargingGatewayAddress:        ie.Release(m.ChargingGatewayAddress),
+		PGWFQCSID:                     ie.Release(m.PGWFQCSID),
+		SGWFQCSID:                     ie.Release(m.SGWFQCSID),
+		SGWLDN:                        ie.Release(m.SGWLDN),
+		PGWLDN:                        ie.Release(m.PGWLDN),
+		PGWBackOffTime:                ie.Release(m.PGWBackOffTime),
+		APCO:                          ie.Release(m.APCO),
+		TrustedTWANIPv4Parameters:     ie.Release(m.TrustedTWANIPv4Parameters),
+		IndicationFlags:               ie.Release(m.IndicationFlags),
+		PresenceReportingAreaAction:   ie.ReleaseSlice(m.PresenceReportingAreaAction),
+		PGWNodeLoadControlInformation: ie.Release(m.PGWNodeLoadControlInformation),
+		PGWAPNLoadControlInformation:  ie.Release(m.PGWAPNLoadControlInformation),
+		SGWNodeLoadControlInformation: ie.Release(m.SGWNodeLoadControlInformation),
+		PGWOverloadControlInformation: ie.Release(m.PGWOverloadControlInformation),
+		SGWOverloadControlInformation: ie.Release(m.SGWOverloadControlInformation),
+		NBIFOMContainer:               ie.Release(m.NBIFOMContainer),
+		PDNConnectionChargingID:       ie.Release(m.PDNConnectionChargingID),
+		EPCO:                          ie.Release(m.EPCO),
+		PrivateExtension:              ie.Release(m.PrivateExtension),
+		AdditionalIEs:                 ie.ReleaseSlice(m.AdditionalIEs),
+	}
+	msgPool.releaseCreateSessionResponse(m)
 }
 
 // MarshalLen returns the serial length in int.

@@ -327,8 +327,35 @@ func (c *CreateBearerRequest) UnmarshalBinary(b []byte) error {
 			c.AdditionalIEs = append(c.AdditionalIEs, i)
 		}
 	}
-
+	ie.ReleaseMultiParseContainer(decodedIEs)
 	return nil
+}
+
+// Reset releases any IEs and truncates slices while maintaining capacity
+func (m *CreateBearerRequest) Reset() {
+	*m = CreateBearerRequest{
+		Header:                        nil,
+		PTI:                           ie.Release(m.PTI),
+		LinkedEBI:                     ie.Release(m.LinkedEBI),
+		PCO:                           ie.Release(m.PCO),
+		BearerContexts:                ie.ReleaseSlice(m.BearerContexts),
+		PGWFQCSID:                     ie.Release(m.PGWFQCSID),
+		SGWFQCSID:                     ie.Release(m.SGWFQCSID),
+		ChangeReportingAction:         ie.Release(m.ChangeReportingAction),
+		CSGInformationReportingAction: ie.Release(m.CSGInformationReportingAction),
+		HeNBInformationReporting:      ie.Release(m.HeNBInformationReporting),
+		PresenceReportingAreaAction:   ie.ReleaseSlice(m.PresenceReportingAreaAction),
+		IndicationFlags:               ie.Release(m.IndicationFlags),
+		PGWNodeLoadControlInformation: ie.Release(m.PGWNodeLoadControlInformation),
+		PGWAPNLoadControlInformation:  ie.Release(m.PGWAPNLoadControlInformation),
+		SGWNodeLoadControlInformation: ie.Release(m.SGWNodeLoadControlInformation),
+		PGWOverloadControlInformation: ie.Release(m.PGWOverloadControlInformation),
+		SGWOverloadControlInformation: ie.Release(m.SGWOverloadControlInformation),
+		NBIFOMContainer:               ie.Release(m.NBIFOMContainer),
+		PrivateExtension:              ie.Release(m.PrivateExtension),
+		AdditionalIEs:                 ie.ReleaseSlice(m.AdditionalIEs),
+	}
+	msgPool.releaseCreateBearerRequest(m)
 }
 
 // MarshalLen returns the serial length in int.

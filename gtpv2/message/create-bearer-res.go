@@ -402,8 +402,40 @@ func (c *CreateBearerResponse) UnmarshalBinary(b []byte) error {
 			c.AdditionalIEs = append(c.AdditionalIEs, i)
 		}
 	}
-
+	ie.ReleaseMultiParseContainer(decodedIEs)
 	return nil
+}
+
+// Reset releases any IEs and truncates slices while maintaining capacity
+func (m *CreateBearerResponse) Reset() {
+	*m = CreateBearerResponse{
+		Header:                             nil,
+		Cause:                              ie.Release(m.Cause),
+		BearerContexts:                     ie.ReleaseSlice(m.BearerContexts),
+		Recovery:                           ie.Release(m.Recovery),
+		MMEFQCSID:                          ie.Release(m.MMEFQCSID),
+		SGWFQCSID:                          ie.Release(m.SGWFQCSID),
+		EPDGFQCSID:                         ie.Release(m.EPDGFQCSID),
+		TWANFQCSID:                         ie.Release(m.TWANFQCSID),
+		PCO:                                ie.Release(m.PCO),
+		UETimeZone:                         ie.Release(m.UETimeZone),
+		ULI:                                ie.Release(m.ULI),
+		TWANIdentifier:                     ie.Release(m.TWANIdentifier),
+		MMEOverloadControlInformation:      ie.Release(m.MMEOverloadControlInformation),
+		SGWOverloadControlInformation:      ie.Release(m.SGWOverloadControlInformation),
+		PresenceReportingAction:            ie.ReleaseSlice(m.PresenceReportingAction),
+		MMESGSNIdentifier:                  ie.Release(m.MMESGSNIdentifier),
+		TWANePDGOverloadControlInformation: ie.Release(m.TWANePDGOverloadControlInformation),
+		WLANLocationInformation:            ie.Release(m.WLANLocationInformation),
+		WLANLocationTimestamp:              ie.Release(m.WLANLocationTimestamp),
+		UELocalIPAddress:                   ie.Release(m.UELocalIPAddress),
+		UEUDPPort:                          ie.Release(m.UEUDPPort),
+		NBIFOMContainer:                    ie.Release(m.NBIFOMContainer),
+		UETCPPort:                          ie.Release(m.UETCPPort),
+		PrivateExtension:                   ie.Release(m.PrivateExtension),
+		AdditionalIEs:                      ie.ReleaseSlice(m.AdditionalIEs),
+	}
+	msgPool.releaseCreateBearerResponse(m)
 }
 
 // MarshalLen returns the serial length in int.

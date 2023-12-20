@@ -321,13 +321,13 @@ func Parse(b []byte) (Message, error) {
 	case MsgTypeVersionNotSupportedIndication:
 		m = &VersionNotSupportedIndication{}
 	case MsgTypeCreateSessionRequest:
-		m = &CreateSessionRequest{}
+		m = msgPool.getCreateSessionRequest()
 	case MsgTypeCreateSessionResponse:
-		m = &CreateSessionResponse{}
+		m = msgPool.getCreateSessionResponse()
 	case MsgTypeDeleteSessionRequest:
-		m = &DeleteSessionRequest{}
+		m = msgPool.getDeleteSessionRequest()
 	case MsgTypeDeleteSessionResponse:
-		m = &DeleteSessionResponse{}
+		m = msgPool.getDeleteSessionResponse()
 	case MsgTypeModifyBearerCommand:
 		m = &ModifyBearerCommand{}
 	case MsgTypeModifyBearerFailureIndication:
@@ -339,9 +339,9 @@ func Parse(b []byte) (Message, error) {
 	case MsgTypeDeleteBearerRequest:
 		m = &DeleteBearerRequest{}
 	case MsgTypeCreateBearerRequest:
-		m = &CreateBearerRequest{}
+		m = msgPool.getCreateBearerRequest()
 	case MsgTypeCreateBearerResponse:
-		m = &CreateBearerResponse{}
+		m = msgPool.getCreateBearerResponse()
 	case MsgTypeDeleteBearerResponse:
 		m = &DeleteBearerResponse{}
 	case MsgTypeModifyBearerRequest:
@@ -359,9 +359,9 @@ func Parse(b []byte) (Message, error) {
 	case MsgTypeContextAcknowledge:
 		m = &ContextAcknowledge{}
 	case MsgTypeReleaseAccessBearersRequest:
-		m = &ReleaseAccessBearersRequest{}
+		m = msgPool.getReleaseAccessBearersRequest()
 	case MsgTypeReleaseAccessBearersResponse:
-		m = &ReleaseAccessBearersResponse{}
+		m = msgPool.getReleaseAccessBearersResponse()
 	case MsgTypeStopPagingIndication:
 		m = &StopPagingIndication{}
 	case MsgTypeModifyAccessBearersRequest:
@@ -415,10 +415,26 @@ func Parse(b []byte) (Message, error) {
 // Release calls any reset/release method on the Message if defined. Messages should not be referenced after calling Release
 func Release(m Message) {
 	switch m.MessageType() {
+	case MsgTypeCreateSessionRequest:
+		m.(*CreateSessionRequest).Reset()
+	case MsgTypeCreateSessionResponse:
+		m.(*CreateSessionResponse).Reset()
+	case MsgTypeCreateBearerRequest:
+		m.(*CreateBearerRequest).Reset()
+	case MsgTypeCreateBearerResponse:
+		m.(*CreateBearerResponse).Reset()
 	case MsgTypeModifyBearerRequest:
 		m.(*ModifyBearerRequest).Reset()
 	case MsgTypeModifyBearerResponse:
 		m.(*ModifyBearerResponse).Reset()
+	case MsgTypeReleaseAccessBearersRequest:
+		m.(*ReleaseAccessBearersRequest).Reset()
+	case MsgTypeReleaseAccessBearersResponse:
+		m.(*ReleaseAccessBearersResponse).Reset()
+	case MsgTypeDeleteSessionRequest:
+		m.(*DeleteSessionRequest).Reset()
+	case MsgTypeDeleteSessionResponse:
+		m.(*DeleteSessionResponse).Reset()
 	}
 }
 

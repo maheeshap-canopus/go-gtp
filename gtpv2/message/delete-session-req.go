@@ -396,8 +396,40 @@ func (d *DeleteSessionRequest) UnmarshalBinary(b []byte) error {
 			d.AdditionalIEs = append(d.AdditionalIEs, i)
 		}
 	}
-
+	ie.ReleaseMultiParseContainer(decodedIEs)
 	return nil
+}
+
+// Reset releases any IEs and truncates slices while maintaining capacity
+func (m *DeleteSessionRequest) Reset() {
+	*m = DeleteSessionRequest{
+		Header:                            nil,
+		Cause:                             ie.Release(m.Cause),
+		LinkedEBI:                         ie.Release(m.LinkedEBI),
+		ULI:                               ie.Release(m.ULI),
+		IndicationFlags:                   ie.Release(m.IndicationFlags),
+		PCO:                               ie.Release(m.PCO),
+		OriginatingNode:                   ie.Release(m.OriginatingNode),
+		SenderFTEIDC:                      ie.Release(m.SenderFTEIDC),
+		UETimeZone:                        ie.Release(m.UETimeZone),
+		ULITimestamp:                      ie.Release(m.ULITimestamp),
+		RANNASReleaseCause:                ie.Release(m.RANNASReleaseCause),
+		TWANIdentifier:                    ie.Release(m.TWANIdentifier),
+		TWANIdentifierTimestamp:           ie.Release(m.TWANIdentifierTimestamp),
+		MMESGSNOverloadControlInformation: ie.Release(m.MMESGSNOverloadControlInformation),
+		SGWOverloadControlInformaion:      ie.Release(m.SGWOverloadControlInformaion),
+		TWANePDGOverloadControlInformaion: ie.Release(m.TWANePDGOverloadControlInformaion),
+		WLANLocationInformation:           ie.Release(m.WLANLocationInformation),
+		WLANLocationTimeStamp:             ie.Release(m.WLANLocationTimeStamp),
+		UELocalIPAddress:                  ie.Release(m.UELocalIPAddress),
+		UEUDPPort:                         ie.Release(m.UEUDPPort),
+		EPCO:                              ie.Release(m.EPCO),
+		UETCPPort:                         ie.Release(m.UETCPPort),
+		SecondaryRATUsageDataReport:       ie.Release(m.SecondaryRATUsageDataReport),
+		PrivateExtension:                  ie.Release(m.PrivateExtension),
+		AdditionalIEs:                     ie.ReleaseSlice(m.AdditionalIEs),
+	}
+	msgPool.releaseDeleteSessionRequest(m)
 }
 
 // MarshalLen returns the serial length in int.

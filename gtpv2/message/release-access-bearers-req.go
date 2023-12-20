@@ -155,8 +155,22 @@ func (r *ReleaseAccessBearersRequest) UnmarshalBinary(b []byte) error {
 			r.AdditionalIEs = append(r.AdditionalIEs, i)
 		}
 	}
-
+	ie.ReleaseMultiParseContainer(decodedIEs)
 	return nil
+}
+
+// Reset releases any IEs and truncates slices while maintaining capacity
+func (m *ReleaseAccessBearersRequest) Reset() {
+	*m = ReleaseAccessBearersRequest{
+		Header:                      nil,
+		ListOfRABs:                  ie.ReleaseSlice(m.ListOfRABs),
+		OriginatingNode:             ie.Release(m.OriginatingNode),
+		IndicationFlags:             ie.Release(m.IndicationFlags),
+		SecondaryRATUsageDataReport: ie.ReleaseSlice(m.SecondaryRATUsageDataReport),
+		PrivateExtension:            ie.Release(m.PrivateExtension),
+		AdditionalIEs:               ie.ReleaseSlice(m.AdditionalIEs),
+	}
+	msgPool.releaseReleaseAccessBearersRequest(m)
 }
 
 // MarshalLen returns the serial length in int.
