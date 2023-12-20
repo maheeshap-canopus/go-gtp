@@ -281,7 +281,11 @@ func (p *pool) release(c *IE) (n *IE) {
 	c.Length = 0
 	c.instance = 0
 	c.Payload = c.Payload[:0]
-	c.ChildIEs = ReleaseSlice(c.ChildIEs)
+	for _, i := range c.ChildIEs {
+		iePool.release(i)
+	}
+	ReleaseMultiParseContainer(c.ChildIEs)
+	c.ChildIEs = nil
 
 	p.releases++
 	select {
