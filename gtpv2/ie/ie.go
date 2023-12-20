@@ -239,9 +239,9 @@ func (i *IE) MarshalTo(b []byte) error {
 	return nil
 }
 
-var IEPool = &iePool{pool: make(chan *IE, 100)} // Default small buffer for applications who don't care about allocations
+var iePool = &pool{pool: make(chan *IE, 100)} // Default small buffer for applications who don't care about allocations
 
-type iePool struct {
+type pool struct {
 	pool     chan *IE
 	allocs   int64
 	frees    int64
@@ -250,14 +250,14 @@ type iePool struct {
 }
 
 func InitIEPool(bufferLen int) {
-	IEPool = &iePool{pool: make(chan *IE, bufferLen)}
+	iePool = &pool{pool: make(chan *IE, bufferLen)}
 }
 
-func (p *iePool) Stats() (allocs, frees, gets, releases int64) {
-	return p.allocs, p.frees, p.gets, p.releases
+func AllocationPoolStats() (allocs, frees, gets, releases int64) {
+	return iePool.allocs, iePool.frees, iePool.gets, iePool.releases
 }
 
-func (p *iePool) Get() (c *IE) {
+func (p *pool) get() (c *IE) {
 	p.gets++
 	select {
 	case c = <-p.pool:
@@ -270,7 +270,7 @@ func (p *iePool) Get() (c *IE) {
 	return c
 }
 
-func (p *iePool) Release(c *IE) (n *IE) {
+func (p *pool) release(c *IE) (n *IE) {
 	// Ignore nil releases
 	if c == nil {
 		return nil
@@ -281,7 +281,7 @@ func (p *iePool) Release(c *IE) (n *IE) {
 	c.Length = 0
 	c.instance = 0
 	c.Payload = c.Payload[:0]
-	c.ChildIEs = c.ChildIEs[:0] // TODO release these?
+	c.ChildIEs = ReleaseSlice(c.ChildIEs)
 
 	p.releases++
 	select {
@@ -294,9 +294,21 @@ func (p *iePool) Release(c *IE) (n *IE) {
 	return nil
 }
 
+func Release(i *IE) *IE {
+	iePool.release(i)
+	return nil
+}
+
+func ReleaseSlice(s []*IE) []*IE {
+	for _, i := range s {
+		iePool.release(i)
+	}
+	return s[:0]
+}
+
 // Parse decodes given byte sequence as a GTPv2 Information Element.
 func Parse(b []byte) (*IE, error) {
-	ie := IEPool.Get()
+	ie := iePool.get()
 	if err := ie.UnmarshalBinary(b); err != nil {
 		return nil, err
 	}

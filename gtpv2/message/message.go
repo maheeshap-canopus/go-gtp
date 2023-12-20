@@ -412,6 +412,14 @@ func Parse(b []byte) (Message, error) {
 	return m, nil
 }
 
+// Release calls any reset/release method on the Message if defined. Messages should not be referenced after calling Release
+func Release(m Message) {
+	switch m.MessageType() {
+	case MsgTypeModifyBearerResponse:
+		m.(*ModifyBearerResponse).Reset()
+	}
+}
+
 // Prettify returns a Message in prettified representation in string.
 //
 // Note that this relies much on reflect package, and thus the frequent use of
