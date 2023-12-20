@@ -345,9 +345,9 @@ func Parse(b []byte) (Message, error) {
 	case MsgTypeDeleteBearerResponse:
 		m = &DeleteBearerResponse{}
 	case MsgTypeModifyBearerRequest:
-		m = &ModifyBearerRequest{}
+		m = msgPool.getModifyBearerRequest()
 	case MsgTypeModifyBearerResponse:
-		m = &ModifyBearerResponse{}
+		m = msgPool.getModifyBearerResponse()
 	case MsgTypeUpdateBearerRequest:
 		m = &UpdateBearerRequest{}
 	case MsgTypeUpdateBearerResponse:

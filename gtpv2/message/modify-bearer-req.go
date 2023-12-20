@@ -603,6 +603,7 @@ func (m *ModifyBearerRequest) Reset() {
 		PrivateExtension:                       ie.Release(m.PrivateExtension),
 		AdditionalIEs:                          ie.ReleaseSlice(m.AdditionalIEs),
 	}
+	msgPool.releaseModifyBearerRequest(m)
 }
 
 // MarshalLen returns the serial length in int.
