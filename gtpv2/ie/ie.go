@@ -270,10 +270,10 @@ func (p *iePool) Get() (c *IE) {
 	return c
 }
 
-func (p *iePool) Release(c *IE) {
+func (p *iePool) Release(c *IE) (n *IE) {
 	// Ignore nil releases
 	if c == nil {
-		return
+		return nil
 	}
 
 	// reset fields but preserve slice capacity
@@ -291,6 +291,7 @@ func (p *iePool) Release(c *IE) {
 		p.frees++
 		// No space in pool, let c be garbage collected
 	}
+	return nil
 }
 
 // Parse decodes given byte sequence as a GTPv2 Information Element.
