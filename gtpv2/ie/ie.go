@@ -243,14 +243,18 @@ var IEPool = &iePool{pool: make(chan *IE, 100)} // Default small buffer for appl
 
 type iePool struct {
 	pool     chan *IE
-	allocs   int
-	frees    int
-	gets     int
-	releases int
+	allocs   int64
+	frees    int64
+	gets     int64
+	releases int64
 }
 
 func InitIEPool(bufferLen int) {
 	IEPool = &iePool{pool: make(chan *IE, bufferLen)}
+}
+
+func (p *iePool) Stats() (allocs, frees, gets, releases int64) {
+	return p.allocs, p.frees, p.gets, p.releases
 }
 
 func (p *iePool) Get() (c *IE) {
