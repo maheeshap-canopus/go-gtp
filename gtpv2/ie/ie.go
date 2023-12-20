@@ -239,9 +239,59 @@ func (i *IE) MarshalTo(b []byte) error {
 	return nil
 }
 
+var IEPool = &iePool{pool: make(chan *IE, 100)} // Default small buffer for applications who don't care about allocations
+
+type iePool struct {
+	pool     chan *IE
+	allocs   int
+	frees    int
+	gets     int
+	releases int
+}
+
+func InitIEPool(bufferLen int) {
+	IEPool = &iePool{pool: make(chan *IE, bufferLen)}
+}
+
+func (p *iePool) Get() (c *IE) {
+	p.gets++
+	select {
+	case c = <-p.pool:
+		// Try to fetch an allocated struct from the pool
+	default:
+		// Init a new struct if nothing available
+		c = &IE{}
+		p.allocs++
+	}
+	return c
+}
+
+func (p *iePool) Release(c *IE) {
+	// Ignore nil releases
+	if c == nil {
+		return
+	}
+
+	// reset fields but preserve slice capacity
+	c.Type = 0
+	c.Length = 0
+	c.instance = 0
+	c.Payload = c.Payload[:0]
+	c.ChildIEs = c.ChildIEs[:0] // TODO release these?
+
+	p.releases++
+	select {
+	case p.pool <- c:
+		// Return c to the pool
+	default:
+		p.frees++
+		// No space in pool, let c be garbage collected
+	}
+}
+
 // Parse decodes given byte sequence as a GTPv2 Information Element.
 func Parse(b []byte) (*IE, error) {
-	ie := &IE{}
+	ie := IEPool.Get()
 	if err := ie.UnmarshalBinary(b); err != nil {
 		return nil, err
 	}
