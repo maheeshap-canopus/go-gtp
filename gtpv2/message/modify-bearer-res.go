@@ -446,7 +446,7 @@ func (m *ModifyBearerResponse) UnmarshalBinary(b []byte) error {
 // Reset releases any IEs and truncates slices while maintaining capacity
 func (m *ModifyBearerResponse) Reset() {
 	*m = ModifyBearerResponse{
-		Header:                         nil,
+		Header:                         ReleaseHeader(m.Header),
 		Cause:                          ie.Release(m.Cause),
 		MSISDN:                         ie.Release(m.MSISDN),
 		LinkedEBI:                      ie.Release(m.LinkedEBI),

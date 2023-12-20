@@ -912,7 +912,7 @@ func (c *CreateSessionRequest) UnmarshalBinary(b []byte) error {
 // Reset releases any IEs and truncates slices while maintaining capacity
 func (m *CreateSessionRequest) Reset() {
 	*m = CreateSessionRequest{
-		Header:                             nil,
+		Header:                             ReleaseHeader(m.Header),
 		IMSI:                               ie.Release(m.IMSI),
 		MSISDN:                             ie.Release(m.MSISDN),
 		MEI:                                ie.Release(m.MEI),

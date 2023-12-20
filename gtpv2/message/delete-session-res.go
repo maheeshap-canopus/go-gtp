@@ -262,7 +262,7 @@ func (d *DeleteSessionResponse) UnmarshalBinary(b []byte) error {
 // Reset releases any IEs and truncates slices while maintaining capacity
 func (m *DeleteSessionResponse) Reset() {
 	*m = DeleteSessionResponse{
-		Header:                        nil,
+		Header:                        ReleaseHeader(m.Header),
 		Cause:                         ie.Release(m.Cause),
 		Recovery:                      ie.Release(m.Recovery),
 		PCO:                           ie.Release(m.PCO),

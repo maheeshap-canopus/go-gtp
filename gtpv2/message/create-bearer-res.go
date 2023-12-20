@@ -409,7 +409,7 @@ func (c *CreateBearerResponse) UnmarshalBinary(b []byte) error {
 // Reset releases any IEs and truncates slices while maintaining capacity
 func (m *CreateBearerResponse) Reset() {
 	*m = CreateBearerResponse{
-		Header:                             nil,
+		Header:                             ReleaseHeader(m.Header),
 		Cause:                              ie.Release(m.Cause),
 		BearerContexts:                     ie.ReleaseSlice(m.BearerContexts),
 		Recovery:                           ie.Release(m.Recovery),

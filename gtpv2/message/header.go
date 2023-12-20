@@ -80,7 +80,7 @@ func (h *Header) MarshalTo(b []byte) error {
 
 // ParseHeader decodes given byte sequence as a GTPv2 header.
 func ParseHeader(b []byte) (*Header, error) {
-	h := &Header{}
+	h := headerPool.get()
 	if err := h.UnmarshalBinary(b); err != nil {
 		return nil, err
 	}

@@ -403,7 +403,7 @@ func (d *DeleteSessionRequest) UnmarshalBinary(b []byte) error {
 // Reset releases any IEs and truncates slices while maintaining capacity
 func (m *DeleteSessionRequest) Reset() {
 	*m = DeleteSessionRequest{
-		Header:                            nil,
+		Header:                            ReleaseHeader(m.Header),
 		Cause:                             ie.Release(m.Cause),
 		LinkedEBI:                         ie.Release(m.LinkedEBI),
 		ULI:                               ie.Release(m.ULI),
