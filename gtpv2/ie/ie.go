@@ -294,6 +294,55 @@ func (p *pool) release(c *IE) (n *IE) {
 	return nil
 }
 
+var sPool = &slicePool{pool: make(chan []*IE, 100)} // Default small buffer for applications who don't care about allocations
+
+type slicePool struct {
+	pool     chan []*IE
+	allocs   int64
+	frees    int64
+	gets     int64
+	releases int64
+}
+
+func InitSlicePool(bufferLen int) {
+	sPool = &slicePool{pool: make(chan []*IE, bufferLen)}
+}
+
+func SliceAllocationPoolStats() (allocs, frees, gets, releases int64) {
+	return sPool.allocs, sPool.frees, sPool.gets, sPool.releases
+}
+
+func (p *slicePool) get() (c []*IE) {
+	p.gets++
+	select {
+	case c = <-p.pool:
+		// Try to fetch an allocated slice from the pool
+	default:
+		// Init a new slice if nothing available
+		c = make([]*IE, 0, 8)
+		p.allocs++
+	}
+	return c
+}
+
+func (p *slicePool) release(c []*IE) {
+	// Ignore nil releases
+	if c == nil {
+		return
+	}
+	// reset length but preserve slice capacity
+	c = c[:0]
+
+	p.releases++
+	select {
+	case p.pool <- c:
+		// Return c to the pool
+	default:
+		p.frees++
+		// No space in pool, let c be garbage collected
+	}
+}
+
 func Release(i *IE) *IE {
 	iePool.release(i)
 	return nil
@@ -304,6 +353,10 @@ func ReleaseSlice(s []*IE) []*IE {
 		iePool.release(i)
 	}
 	return s[:0]
+}
+
+func ReleaseMultiParseContainer(s []*IE) {
+	sPool.release(s)
 }
 
 // Parse decodes given byte sequence as a GTPv2 Information Element.
@@ -477,7 +530,7 @@ func (i *IE) FindByType(typ, instance uint8) (*IE, error) {
 // When you don't know the number of IEs, this is the only way to decode them.
 // See benchmarks in diameter_test.go for the detail.
 func ParseMultiIEs(b []byte) ([]*IE, error) {
-	var ies []*IE
+	var ies = sPool.get()
 	for {
 		if len(b) == 0 {
 			break

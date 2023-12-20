@@ -439,7 +439,7 @@ func (m *ModifyBearerResponse) UnmarshalBinary(b []byte) error {
 			m.AdditionalIEs = append(m.AdditionalIEs, i)
 		}
 	}
-
+	ie.ReleaseMultiParseContainer(decodedIEs)
 	return nil
 }
 
