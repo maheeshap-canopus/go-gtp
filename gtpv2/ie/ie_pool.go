@@ -123,3 +123,10 @@ func ReleaseSlice(s []*IE) []*IE {
 func ReleaseMultiParseContainer(s []*IE) {
 	sPool.release(s)
 }
+
+func ReleaseMultiIEsAndContainer(s []*IE) {
+	for _, i := range s {
+		iePool.release(i)
+	}
+	sPool.release(s)
+}

@@ -31,9 +31,12 @@ func (i *IE) EPSBearerID() (uint8, error) {
 
 		for _, child := range ies {
 			if child.Type == EPSBearerID {
-				return child.EPSBearerID()
+				bid, err := child.EPSBearerID()
+				ReleaseMultiIEsAndContainer(ies)
+				return bid, err
 			}
 		}
+		ReleaseMultiIEsAndContainer(ies)
 		return 0, ErrIENotFound
 	default:
 		return 0, &InvalidTypeError{Type: i.Type}
