@@ -1,17 +1,28 @@
 package ie
 
-var iePool = &pool{pool: make(chan *IE, 100)} // Default small buffer for applications who don't care about allocations
+import "pgregory.net/rand"
+
+var iePool = newIEPool(100, 32) // Default small buffer for applications who don't care about allocations
 
 type pool struct {
-	pool     chan *IE
-	allocs   int64
-	frees    int64
-	gets     int64
-	releases int64
+	pool      []chan *IE
+	nChannels int
+	allocs    int64
+	frees     int64
+	gets      int64
+	releases  int64
 }
 
-func InitIEPool(bufferLen int) {
-	iePool = &pool{pool: make(chan *IE, bufferLen)}
+func newIEPool(bufferLen, nChannels int) *pool {
+	sp := &pool{pool: make([]chan *IE, nChannels), nChannels: nChannels}
+	for i := 0; i < nChannels; i++ {
+		sp.pool[i] = make(chan *IE, bufferLen)
+	}
+	return sp
+}
+
+func InitIEPool(bufferLen, nChannels int) {
+	iePool = newIEPool(bufferLen, nChannels)
 }
 
 func IEPoolStats() (allocs, frees, gets, releases int64) {
@@ -21,7 +32,7 @@ func IEPoolStats() (allocs, frees, gets, releases int64) {
 func (p *pool) get() (c *IE) {
 	p.gets++
 	select {
-	case c = <-p.pool:
+	case c = <-p.pool[rand.Int()%p.nChannels]:
 		// Try to fetch an allocated struct from the pool
 	default:
 		// Init a new struct if nothing available
@@ -50,7 +61,7 @@ func (p *pool) release(c *IE) (n *IE) {
 
 	p.releases++
 	select {
-	case p.pool <- c:
+	case p.pool[rand.Int()%p.nChannels] <- c:
 		// Return c to the pool
 	default:
 		p.frees++
@@ -59,18 +70,27 @@ func (p *pool) release(c *IE) (n *IE) {
 	return nil
 }
 
-var sPool = &slicePool{pool: make(chan []*IE, 100)} // Default small buffer for applications who don't care about allocations
+var sPool = newIESlicePool(100, 4) // Default small buffer for applications who don't care about allocations
 
 type slicePool struct {
-	pool     chan []*IE
-	allocs   int64
-	frees    int64
-	gets     int64
-	releases int64
+	pool      []chan []*IE
+	nChannels int
+	allocs    int64
+	frees     int64
+	gets      int64
+	releases  int64
 }
 
-func InitIESlicePool(bufferLen int) {
-	sPool = &slicePool{pool: make(chan []*IE, bufferLen)}
+func newIESlicePool(bufferLen, nChannels int) *slicePool {
+	sp := &slicePool{pool: make([]chan []*IE, nChannels), nChannels: nChannels}
+	for i := 0; i < nChannels; i++ {
+		sp.pool[i] = make(chan []*IE, bufferLen)
+	}
+	return sp
+}
+
+func InitIESlicePool(bufferLen, nChannels int) {
+	sPool = newIESlicePool(bufferLen, nChannels)
 }
 
 func IESlicePoolStats() (allocs, frees, gets, releases int64) {
@@ -80,8 +100,8 @@ func IESlicePoolStats() (allocs, frees, gets, releases int64) {
 func (p *slicePool) get() (c []*IE) {
 	p.gets++
 	select {
-	case c = <-p.pool:
-		// Try to fetch an allocated slice from the pool
+	case c = <-p.pool[rand.Int()%p.nChannels]:
+		// Try to fetch an allocated slice from a random part of the pool
 	default:
 		// Init a new slice if nothing available
 		c = make([]*IE, 0, 8)
@@ -100,8 +120,8 @@ func (p *slicePool) release(c []*IE) {
 
 	p.releases++
 	select {
-	case p.pool <- c:
-		// Return c to the pool
+	case p.pool[rand.Int()%p.nChannels] <- c:
+		// Return c to a random part of the pool
 	default:
 		p.frees++
 		// No space in pool, let c be garbage collected
