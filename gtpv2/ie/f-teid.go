@@ -42,6 +42,16 @@ func (i *IE) FullyQualifiedTEID() (*FullyQualifiedTEIDFields, error) {
 	}
 }
 
+// PopulateFullyQualifiedTEID populates FullyQualifiedTEIDFields type if the type of IE matches.
+func (i *IE) PopulateFullyQualifiedTEID(p *FullyQualifiedTEIDFields) error {
+	switch i.Type {
+	case FullyQualifiedTEID:
+		return p.UnmarshalBinary(i.Payload)
+	default:
+		return &InvalidTypeError{Type: i.Type}
+	}
+}
+
 // FullyQualifiedTEIDFields is a set of fields in FullyQualifiedTEID IE.
 type FullyQualifiedTEIDFields struct {
 	Flags         uint8 // 7-8th bit, in the same octet as InterfaceType
@@ -131,6 +141,7 @@ func (f *FullyQualifiedTEIDFields) UnmarshalBinary(b []byte) error {
 		return io.ErrUnexpectedEOF
 	}
 
+	*f = FullyQualifiedTEIDFields{}
 	f.Flags = b[0] & 0xc0
 	f.InterfaceType = b[0] & 0x3f
 	f.TEIDGREKey = binary.BigEndian.Uint32(b[1:5])
