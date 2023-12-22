@@ -229,6 +229,17 @@ func (i *IE) UserLocationInformation() (*UserLocationInformationFields, error) {
 	}
 }
 
+// PopulateUserLocationInformation populates UserLocationInformationFields type
+// if the type of IE matches.
+func (i *IE) PopulateUserLocationInformation(uli *UserLocationInformationFields) error {
+	switch i.Type {
+	case UserLocationInformation:
+		return uli.UnmarshalBinary(i.Payload)
+	default:
+		return &InvalidTypeError{Type: i.Type}
+	}
+}
+
 // UserLocationInformationFields is a set of fields in UserLocationInformation IE.
 //
 // The contained fields are of type struct, as they are too complex to handle with
@@ -440,7 +451,18 @@ func (f *UserLocationInformationFields) UnmarshalBinary(b []byte) error {
 			return io.ErrUnexpectedEOF
 		}
 
-		f.CGI = &CGI{PLMN: &PLMN{}}
+		if f.CGI == nil {
+			f.CGI = &CGI{PLMN: &PLMN{}}
+		} else {
+			plmnTmp := f.CGI.PLMN
+			*(f.CGI) = CGI{}
+			if plmnTmp == nil {
+				plmnTmp = &PLMN{}
+			} else {
+				*plmnTmp = PLMN{}
+			}
+			f.CGI.PLMN = plmnTmp
+		}
 		f.CGI.PLMN.MCC, f.CGI.PLMN.MNC, err = utils.DecodePLMN(b[offset : offset+3])
 		if err != nil {
 			return err
@@ -454,7 +476,18 @@ func (f *UserLocationInformationFields) UnmarshalBinary(b []byte) error {
 			return io.ErrUnexpectedEOF
 		}
 
-		f.SAI = &SAI{PLMN: &PLMN{}}
+		if f.SAI == nil {
+			f.SAI = &SAI{PLMN: &PLMN{}}
+		} else {
+			plmnTmp := f.SAI.PLMN
+			*(f.SAI) = SAI{}
+			if plmnTmp == nil {
+				plmnTmp = &PLMN{}
+			} else {
+				*plmnTmp = PLMN{}
+			}
+			f.SAI.PLMN = plmnTmp
+		}
 		f.SAI.PLMN.MCC, f.SAI.PLMN.MNC, err = utils.DecodePLMN(b[offset : offset+3])
 		if err != nil {
 			return err
@@ -468,7 +501,18 @@ func (f *UserLocationInformationFields) UnmarshalBinary(b []byte) error {
 			return io.ErrUnexpectedEOF
 		}
 
-		f.RAI = &RAI{PLMN: &PLMN{}}
+		if f.RAI == nil {
+			f.RAI = &RAI{PLMN: &PLMN{}}
+		} else {
+			plmnTmp := f.RAI.PLMN
+			*(f.RAI) = RAI{}
+			if plmnTmp == nil {
+				plmnTmp = &PLMN{}
+			} else {
+				*plmnTmp = PLMN{}
+			}
+			f.RAI.PLMN = plmnTmp
+		}
 		f.RAI.PLMN.MCC, f.RAI.PLMN.MNC, err = utils.DecodePLMN(b[offset : offset+3])
 		if err != nil {
 			return err
@@ -482,7 +526,18 @@ func (f *UserLocationInformationFields) UnmarshalBinary(b []byte) error {
 			return io.ErrUnexpectedEOF
 		}
 
-		f.TAI = &TAI{PLMN: &PLMN{}}
+		if f.TAI == nil {
+			f.TAI = &TAI{PLMN: &PLMN{}}
+		} else {
+			plmnTmp := f.TAI.PLMN
+			*(f.TAI) = TAI{}
+			if plmnTmp == nil {
+				plmnTmp = &PLMN{}
+			} else {
+				*plmnTmp = PLMN{}
+			}
+			f.TAI.PLMN = plmnTmp
+		}
 		f.TAI.PLMN.MCC, f.TAI.PLMN.MNC, err = utils.DecodePLMN(b[offset : offset+3])
 		if err != nil {
 			return err
@@ -495,7 +550,18 @@ func (f *UserLocationInformationFields) UnmarshalBinary(b []byte) error {
 			return io.ErrUnexpectedEOF
 		}
 
-		f.ECGI = &ECGI{PLMN: &PLMN{}}
+		if f.ECGI == nil {
+			f.ECGI = &ECGI{PLMN: &PLMN{}}
+		} else {
+			plmnTmp := f.ECGI.PLMN
+			*(f.ECGI) = ECGI{}
+			if plmnTmp == nil {
+				plmnTmp = &PLMN{}
+			} else {
+				*plmnTmp = PLMN{}
+			}
+			f.ECGI.PLMN = plmnTmp
+		}
 		f.ECGI.PLMN.MCC, f.ECGI.PLMN.MNC, err = utils.DecodePLMN(b[offset : offset+3])
 		if err != nil {
 			return err
@@ -508,7 +574,18 @@ func (f *UserLocationInformationFields) UnmarshalBinary(b []byte) error {
 			return io.ErrUnexpectedEOF
 		}
 
-		f.LAI = &LAI{PLMN: &PLMN{}}
+		if f.LAI == nil {
+			f.LAI = &LAI{PLMN: &PLMN{}}
+		} else {
+			plmnTmp := f.LAI.PLMN
+			*(f.LAI) = LAI{}
+			if plmnTmp == nil {
+				plmnTmp = &PLMN{}
+			} else {
+				*plmnTmp = PLMN{}
+			}
+			f.LAI.PLMN = plmnTmp
+		}
 		f.LAI.PLMN.MCC, f.LAI.PLMN.MNC, err = utils.DecodePLMN(b[offset : offset+3])
 		if err != nil {
 			return err
@@ -521,7 +598,18 @@ func (f *UserLocationInformationFields) UnmarshalBinary(b []byte) error {
 			return io.ErrUnexpectedEOF
 		}
 
-		f.MENBI = &MENBI{PLMN: &PLMN{}}
+		if f.MENBI == nil {
+			f.MENBI = &MENBI{PLMN: &PLMN{}}
+		} else {
+			plmnTmp := f.MENBI.PLMN
+			*(f.MENBI) = MENBI{}
+			if plmnTmp == nil {
+				plmnTmp = &PLMN{}
+			} else {
+				*plmnTmp = PLMN{}
+			}
+			f.MENBI.PLMN = plmnTmp
+		}
 		f.MENBI.PLMN.MCC, f.MENBI.PLMN.MNC, err = utils.DecodePLMN(b[offset : offset+3])
 		if err != nil {
 			return err
@@ -534,7 +622,18 @@ func (f *UserLocationInformationFields) UnmarshalBinary(b []byte) error {
 			return io.ErrUnexpectedEOF
 		}
 
-		f.EMENBI = &EMENBI{PLMN: &PLMN{}}
+		if f.EMENBI == nil {
+			f.EMENBI = &EMENBI{PLMN: &PLMN{}}
+		} else {
+			plmnTmp := f.EMENBI.PLMN
+			*(f.EMENBI) = EMENBI{}
+			if plmnTmp == nil {
+				plmnTmp = &PLMN{}
+			} else {
+				*plmnTmp = PLMN{}
+			}
+			f.EMENBI.PLMN = plmnTmp
+		}
 		f.EMENBI.PLMN.MCC, f.EMENBI.PLMN.MNC, err = utils.DecodePLMN(b[offset : offset+3])
 		if err != nil {
 			return err
