@@ -229,17 +229,6 @@ func (i *IE) UserLocationInformation() (*UserLocationInformationFields, error) {
 	}
 }
 
-// PopulateUserLocationInformation populates UserLocationInformationFields type
-// if the type of IE matches.
-func (i *IE) PopulateUserLocationInformation(uli *UserLocationInformationFields) error {
-	switch i.Type {
-	case UserLocationInformation:
-		return uli.UnmarshalBinary(i.Payload)
-	default:
-		return &InvalidTypeError{Type: i.Type}
-	}
-}
-
 // UserLocationInformationFields is a set of fields in UserLocationInformation IE.
 //
 // The contained fields are of type struct, as they are too complex to handle with
