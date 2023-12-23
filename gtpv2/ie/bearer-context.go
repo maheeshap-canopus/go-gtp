@@ -117,3 +117,22 @@ func (i *IE) BearerContext() ([]*IE, error) {
 
 	return ies, nil
 }
+
+// BearerContextIntoSlice returns the []*IE inside BearerContext IE
+// and the number of elements parsed (which may be less than the length of the slice).
+func (i *IE) BearerContextIntoSlice(ies []*IE) ([]*IE, int, error) {
+	if i.Type != BearerContext {
+		return nil, 0, &InvalidTypeError{Type: i.Type}
+	}
+	if len(i.Payload) < 1 {
+		return nil, 0, io.ErrUnexpectedEOF
+	}
+	var err error
+	var parsed int
+	ies, parsed, err = ParseIntoMultiIEs(ies, i.Payload)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return ies, parsed, nil
+}

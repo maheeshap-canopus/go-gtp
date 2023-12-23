@@ -425,8 +425,6 @@ func Release(m Message) {
 		m.(*CreateBearerResponse).Reset()
 	case MsgTypeModifyBearerRequest:
 		m.(*ModifyBearerRequest).Reset()
-	case MsgTypeModifyBearerResponse:
-		m.(*ModifyBearerResponse).Reset()
 	case MsgTypeReleaseAccessBearersRequest:
 		m.(*ReleaseAccessBearersRequest).Reset()
 	case MsgTypeReleaseAccessBearersResponse:

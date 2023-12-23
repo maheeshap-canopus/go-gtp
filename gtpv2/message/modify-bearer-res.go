@@ -38,6 +38,7 @@ type ModifyBearerResponse struct {
 	PDNConnectionChargingID        *ie.IE
 	PrivateExtension               *ie.IE
 	AdditionalIEs                  []*ie.IE
+	multiParseContainer            []*ie.IE
 }
 
 // NewModifyBearerResponse creates a new ModifyBearerResponse.
@@ -340,7 +341,10 @@ func ParseModifyBearerResponse(b []byte) (*ModifyBearerResponse, error) {
 // UnmarshalBinary decodes given bytes as ModifyBearerResponse.
 func (m *ModifyBearerResponse) UnmarshalBinary(b []byte) error {
 	var err error
-	m.Header, err = ParseHeader(b)
+	if m.Header == nil {
+		m.Header = &Header{}
+	}
+	err = m.Header.UnmarshalBinary(b)
 	if err != nil {
 		return err
 	}
@@ -348,12 +352,14 @@ func (m *ModifyBearerResponse) UnmarshalBinary(b []byte) error {
 		return nil
 	}
 
-	decodedIEs, err := ie.ParseMultiIEs(m.Header.Payload)
+	var parsed int
+	m.multiParseContainer, parsed, err = ie.ParseIntoMultiIEs(m.multiParseContainer, m.Header.Payload)
 	if err != nil {
 		return err
 	}
 
-	for _, i := range decodedIEs {
+	for idx := 0; idx < parsed; idx++ {
+		i := m.multiParseContainer[idx]
 		if i == nil {
 			continue
 		}
@@ -439,43 +445,42 @@ func (m *ModifyBearerResponse) UnmarshalBinary(b []byte) error {
 			m.AdditionalIEs = append(m.AdditionalIEs, i)
 		}
 	}
-	ie.ReleaseMultiParseContainer(decodedIEs)
 	return nil
 }
 
 // Reset releases any IEs and truncates slices while maintaining capacity
 func (m *ModifyBearerResponse) Reset() {
 	*m = ModifyBearerResponse{
-		Header:                         ReleaseHeader(m.Header),
-		Cause:                          ie.Release(m.Cause),
-		MSISDN:                         ie.Release(m.MSISDN),
-		LinkedEBI:                      ie.Release(m.LinkedEBI),
-		APNRestriction:                 ie.Release(m.APNRestriction),
-		PCO:                            ie.Release(m.PCO),
-		BearerContextsModified:         ie.ReleaseSlice(m.BearerContextsModified),
-		BearerContextsMarkedForRemoval: ie.ReleaseSlice(m.BearerContextsMarkedForRemoval),
-		ChangeReportingAction:          ie.Release(m.ChangeReportingAction),
-		CSGInformationReportingAction:  ie.Release(m.CSGInformationReportingAction),
-		HeNBInformationReporting:       ie.Release(m.HeNBInformationReporting),
-		ChargingGatewayName:            ie.Release(m.ChargingGatewayName),
-		ChargingGatewayAddress:         ie.Release(m.ChargingGatewayAddress),
-		PGWFQCSID:                      ie.Release(m.PGWFQCSID),
-		SGWFQCSID:                      ie.Release(m.SGWFQCSID),
-		Recovery:                       ie.Release(m.Recovery),
-		SGWLDN:                         ie.Release(m.SGWLDN),
-		PGWLDN:                         ie.Release(m.PGWLDN),
-		IndicationFlags:                ie.Release(m.IndicationFlags),
-		PresenceReportingAreaAction:    ie.ReleaseSlice(m.PresenceReportingAreaAction),
-		PGWNodeLoadControlInformation:  ie.Release(m.PGWNodeLoadControlInformation),
-		PGWAPNLoadControlInformation:   ie.Release(m.PGWAPNLoadControlInformation),
-		SGWNodeLoadControlInformation:  ie.Release(m.SGWNodeLoadControlInformation),
-		PGWOverloadControlInformation:  ie.Release(m.PGWOverloadControlInformation),
-		SGWOverloadControlInformation:  ie.Release(m.SGWOverloadControlInformation),
-		PDNConnectionChargingID:        ie.Release(m.PDNConnectionChargingID),
-		PrivateExtension:               ie.Release(m.PrivateExtension),
-		AdditionalIEs:                  ie.ReleaseSlice(m.AdditionalIEs),
+		Header:                         m.Header,
+		Cause:                          ie.ReleaseNil(m.Cause),
+		MSISDN:                         ie.ReleaseNil(m.MSISDN),
+		LinkedEBI:                      ie.ReleaseNil(m.LinkedEBI),
+		APNRestriction:                 ie.ReleaseNil(m.APNRestriction),
+		PCO:                            ie.ReleaseNil(m.PCO),
+		BearerContextsModified:         ie.ReleaseSliceTrunc(m.BearerContextsModified),
+		BearerContextsMarkedForRemoval: ie.ReleaseSliceTrunc(m.BearerContextsMarkedForRemoval),
+		ChangeReportingAction:          ie.ReleaseNil(m.ChangeReportingAction),
+		CSGInformationReportingAction:  ie.ReleaseNil(m.CSGInformationReportingAction),
+		HeNBInformationReporting:       ie.ReleaseNil(m.HeNBInformationReporting),
+		ChargingGatewayName:            ie.ReleaseNil(m.ChargingGatewayName),
+		ChargingGatewayAddress:         ie.ReleaseNil(m.ChargingGatewayAddress),
+		PGWFQCSID:                      ie.ReleaseNil(m.PGWFQCSID),
+		SGWFQCSID:                      ie.ReleaseNil(m.SGWFQCSID),
+		Recovery:                       ie.ReleaseNil(m.Recovery),
+		SGWLDN:                         ie.ReleaseNil(m.SGWLDN),
+		PGWLDN:                         ie.ReleaseNil(m.PGWLDN),
+		IndicationFlags:                ie.ReleaseNil(m.IndicationFlags),
+		PresenceReportingAreaAction:    ie.ReleaseSliceTrunc(m.PresenceReportingAreaAction),
+		PGWNodeLoadControlInformation:  ie.ReleaseNil(m.PGWNodeLoadControlInformation),
+		PGWAPNLoadControlInformation:   ie.ReleaseNil(m.PGWAPNLoadControlInformation),
+		SGWNodeLoadControlInformation:  ie.ReleaseNil(m.SGWNodeLoadControlInformation),
+		PGWOverloadControlInformation:  ie.ReleaseNil(m.PGWOverloadControlInformation),
+		SGWOverloadControlInformation:  ie.ReleaseNil(m.SGWOverloadControlInformation),
+		PDNConnectionChargingID:        ie.ReleaseNil(m.PDNConnectionChargingID),
+		PrivateExtension:               ie.ReleaseNil(m.PrivateExtension),
+		AdditionalIEs:                  ie.ReleaseSliceTrunc(m.AdditionalIEs),
+		multiParseContainer:            m.multiParseContainer,
 	}
-	msgPool.releaseModifyBearerResponse(m)
 }
 
 // MarshalLen returns the serial length in int.

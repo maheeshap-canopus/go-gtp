@@ -248,6 +248,17 @@ func Parse(b []byte) (*IE, error) {
 	return ie, nil
 }
 
+// ParseInto decodes given byte sequence as a GTPv2 Information Element.
+func ParseInto(ie *IE, b []byte) (*IE, error) {
+	if ie == nil {
+		ie = &IE{}
+	}
+	if err := ie.UnmarshalBinary(b); err != nil {
+		return nil, err
+	}
+	return ie, nil
+}
+
 // UnmarshalBinary sets the values retrieved from byte sequence in GTPv2 IE.
 func (i *IE) UnmarshalBinary(b []byte) error {
 	l := len(b)
@@ -266,7 +277,9 @@ func (i *IE) UnmarshalBinary(b []byte) error {
 
 	if i.IsGrouped() {
 		var err error
-		i.ChildIEs, err = ParseMultiIEs(i.Payload)
+		var parsed int
+		i.ChildIEs, parsed, err = ParseIntoMultiIEs(i.ChildIEs, i.Payload)
+		i.ChildIEs = i.ChildIEs[:parsed]
 		if err != nil {
 			return err
 		}
@@ -424,6 +437,30 @@ func ParseMultiIEs(b []byte) ([]*IE, error) {
 		b = b[i.MarshalLen():]
 	}
 	return ies, nil
+}
+
+// ParseIntoMultiIEs decodes multiple IEs at a time.
+// This is easy and useful but slower than decoding one by one.
+// When you don't know the number of IEs, this is the only way to decode them.
+// See benchmarks in diameter_test.go for the detail.
+func ParseIntoMultiIEs(ies []*IE, b []byte) ([]*IE, int, error) {
+	var parsed int
+	for {
+		if len(b) == 0 {
+			break
+		}
+		if parsed >= len(ies) {
+			ies = append(ies, nil)
+		}
+		var err error
+		ies[parsed], err = ParseInto(ies[parsed], b)
+		if err != nil {
+			return nil, 0, err
+		}
+		b = b[ies[parsed].MarshalLen():]
+		parsed++
+	}
+	return ies, parsed, nil
 }
 
 func newUint8ValIE(t, v uint8) *IE {

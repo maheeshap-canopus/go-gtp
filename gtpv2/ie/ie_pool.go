@@ -47,6 +47,7 @@ func (p *pool) release(c *IE) (n *IE) {
 	if c == nil {
 		return nil
 	}
+	return
 
 	// reset fields but preserve slice capacity
 	c.Type = 0
@@ -128,9 +129,17 @@ func (p *slicePool) release(c []*IE) {
 	}
 }
 
+func ReleaseNil(i *IE) *IE {
+	return nil
+}
+
 func Release(i *IE) *IE {
 	iePool.release(i)
 	return nil
+}
+
+func ReleaseSliceTrunc(s []*IE) []*IE {
+	return s[:0]
 }
 
 func ReleaseSlice(s []*IE) []*IE {
