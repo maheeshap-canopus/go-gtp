@@ -542,7 +542,7 @@ func (c *CreateSessionResponse) UnmarshalBinary(b []byte) error {
 // Reset releases any IEs and truncates slices while maintaining capacity
 func (m *CreateSessionResponse) Reset() {
 	*m = CreateSessionResponse{
-		Header:                        ReleaseHeader(m.Header),
+		Header:                        ResetHeader(m.Header),
 		Cause:                         ie.Release(m.Cause),
 		ChangeReportingAction:         ie.Release(m.ChangeReportingAction),
 		CSGInformationReportingAction: ie.Release(m.CSGInformationReportingAction),

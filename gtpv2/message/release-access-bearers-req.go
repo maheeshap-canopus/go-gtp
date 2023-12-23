@@ -161,7 +161,7 @@ func (r *ReleaseAccessBearersRequest) UnmarshalBinary(b []byte) error {
 // Reset releases any IEs and truncates slices while maintaining capacity
 func (m *ReleaseAccessBearersRequest) Reset() {
 	*m = ReleaseAccessBearersRequest{
-		Header:                      ReleaseHeader(m.Header),
+		Header:                      ResetHeader(m.Header),
 		ListOfRABs:                  ie.ReleaseSlice(m.ListOfRABs),
 		OriginatingNode:             ie.Release(m.OriginatingNode),
 		IndicationFlags:             ie.Release(m.IndicationFlags),
