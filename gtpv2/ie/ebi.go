@@ -31,26 +31,13 @@ func (i *IE) EPSBearerID() (uint8, error) {
 
 		for _, child := range ies {
 			if child.Type == EPSBearerID {
-				bid, err := child.EPSBearerID()
-				return bid, err
+				return child.EPSBearerID()
 			}
 		}
 		return 0, ErrIENotFound
 	default:
 		return 0, &InvalidTypeError{Type: i.Type}
 	}
-}
-
-// FindEPSBearerID returns EPSBearerID if the type of IE matches is present in the slice of IE.
-// The limit arg should not exceed the length of the ies slice.
-func FindEPSBearerID(ies []*IE, limit int) (uint8, error) {
-	for idx := 0; idx < limit; idx++ {
-		i := ies[idx]
-		if i.Type == EPSBearerID {
-			return i.EPSBearerID()
-		}
-	}
-	return 0, ErrIENotFound
 }
 
 // MustEPSBearerID returns EPSBearerID in uint8, ignoring errors.

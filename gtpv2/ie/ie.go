@@ -418,6 +418,18 @@ func (i *IE) FindByType(typ, instance uint8) (*IE, error) {
 	return nil, ErrIENotFound
 }
 
+// FindByTypeInSlice returns the first IE from the slice which matches the provided type (within limit attempts),
+// The limit arg should not exceed the length of the ies slice.
+func FindByTypeInSlice(ies []*IE, typ uint8, limit int) (*IE, error) {
+	for idx := 0; idx < limit; idx++ {
+		i := ies[idx]
+		if i.Type == typ {
+			return i, nil
+		}
+	}
+	return nil, ErrIENotFound
+}
+
 // ParseMultiIEs decodes multiple IEs at a time.
 // This is easy and useful but slower than decoding one by one.
 // When you don't know the number of IEs, this is the only way to decode them.
