@@ -112,8 +112,15 @@ func EncodePLMN(mcc, mnc string) ([]byte, error) {
 	return b, nil
 }
 
+var usePLMNMemoization bool
+var memoizedMNCs [0xFFFF + 1]string
+var memoizedMCCs [0xFFFF + 1]string
+
 // DecodeMCC decodes BCD-encoded MCC as it occurs in CGI/SAI/RAI.
 func DecodeMNC(b []byte) string {
+	if usePLMNMemoization {
+		return memoizedMNCs[binary.BigEndian.Uint16(b)]
+	}
 	raw := hex.EncodeToString(b)
 	if raw[0] == 'f' {
 		return string([]byte{raw[3], raw[2]})
@@ -123,6 +130,9 @@ func DecodeMNC(b []byte) string {
 
 // DecodeMNC decodes BCD-encoded MNC as it occurs in CGI/SAI/RAI
 func DecodeMCC(b []byte) string {
+	if usePLMNMemoization {
+		return memoizedMCCs[binary.BigEndian.Uint16(b)]
+	}
 	raw := hex.EncodeToString(b)
 	return string([]byte{raw[1], raw[0], raw[3]})
 }
@@ -141,4 +151,20 @@ func ParseECI(eci uint32) (enbID uint32, cellID uint8, err error) {
 	cellID = buf[3]
 	enbID = binary.BigEndian.Uint32([]byte{0, buf[0], buf[1], buf[2]})
 	return
+}
+
+func EnablePLMNMemoization() {
+	var i uint16
+	for i = 0; i < 0xFFFF; i++ {
+		buf := make([]byte, 2)
+		binary.BigEndian.PutUint16(buf, i)
+		memoizedMCCs[i] = DecodeMCC(buf)
+		memoizedMNCs[i] = DecodeMNC(buf)
+	}
+	i = 0xFFFF
+	buf := make([]byte, 2)
+	binary.BigEndian.PutUint16(buf, i)
+	memoizedMCCs[i] = DecodeMCC(buf)
+	memoizedMNCs[i] = DecodeMNC(buf)
+	usePLMNMemoization = true
 }
