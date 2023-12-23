@@ -905,7 +905,6 @@ func (c *CreateSessionRequest) UnmarshalBinary(b []byte) error {
 			c.AdditionalIEs = append(c.AdditionalIEs, i)
 		}
 	}
-	ie.ReleaseMultiParseContainer(decodedIEs)
 	return nil
 }
 
@@ -980,7 +979,6 @@ func (m *CreateSessionRequest) Reset() {
 		PrivateExtension:                   ie.Release(m.PrivateExtension),
 		AdditionalIEs:                      ie.ReleaseSlice(m.AdditionalIEs),
 	}
-	msgPool.releaseCreateSessionRequest(m)
 }
 
 // MarshalLen returns the serial length in int.

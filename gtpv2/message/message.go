@@ -321,13 +321,13 @@ func Parse(b []byte) (Message, error) {
 	case MsgTypeVersionNotSupportedIndication:
 		m = &VersionNotSupportedIndication{}
 	case MsgTypeCreateSessionRequest:
-		m = msgPool.getCreateSessionRequest()
+		m = &CreateSessionRequest{}
 	case MsgTypeCreateSessionResponse:
-		m = msgPool.getCreateSessionResponse()
+		m = &CreateSessionResponse{}
 	case MsgTypeDeleteSessionRequest:
-		m = msgPool.getDeleteSessionRequest()
+		m = &DeleteSessionRequest{}
 	case MsgTypeDeleteSessionResponse:
-		m = msgPool.getDeleteSessionResponse()
+		m = &DeleteSessionResponse{}
 	case MsgTypeModifyBearerCommand:
 		m = &ModifyBearerCommand{}
 	case MsgTypeModifyBearerFailureIndication:
@@ -339,15 +339,15 @@ func Parse(b []byte) (Message, error) {
 	case MsgTypeDeleteBearerRequest:
 		m = &DeleteBearerRequest{}
 	case MsgTypeCreateBearerRequest:
-		m = msgPool.getCreateBearerRequest()
+		m = &CreateBearerRequest{}
 	case MsgTypeCreateBearerResponse:
-		m = msgPool.getCreateBearerResponse()
+		m = &CreateBearerResponse{}
 	case MsgTypeDeleteBearerResponse:
 		m = &DeleteBearerResponse{}
 	case MsgTypeModifyBearerRequest:
-		m = msgPool.getModifyBearerRequest()
+		m = &ModifyBearerRequest{}
 	case MsgTypeModifyBearerResponse:
-		m = msgPool.getModifyBearerResponse()
+		m = &ModifyBearerResponse{}
 	case MsgTypeUpdateBearerRequest:
 		m = &UpdateBearerRequest{}
 	case MsgTypeUpdateBearerResponse:
@@ -359,9 +359,9 @@ func Parse(b []byte) (Message, error) {
 	case MsgTypeContextAcknowledge:
 		m = &ContextAcknowledge{}
 	case MsgTypeReleaseAccessBearersRequest:
-		m = msgPool.getReleaseAccessBearersRequest()
+		m = &ReleaseAccessBearersRequest{}
 	case MsgTypeReleaseAccessBearersResponse:
-		m = msgPool.getReleaseAccessBearersResponse()
+		m = &ReleaseAccessBearersResponse{}
 	case MsgTypeStopPagingIndication:
 		m = &StopPagingIndication{}
 	case MsgTypeModifyAccessBearersRequest:
@@ -410,30 +410,6 @@ func Parse(b []byte) (Message, error) {
 		return nil, fmt.Errorf("failed to decode GTPv2 Message: %w", err)
 	}
 	return m, nil
-}
-
-// Release calls any reset/release method on the Message if defined. Messages should not be referenced after calling Release
-func Release(m Message) {
-	switch m.MessageType() {
-	case MsgTypeCreateSessionRequest:
-		m.(*CreateSessionRequest).Reset()
-	case MsgTypeCreateSessionResponse:
-		m.(*CreateSessionResponse).Reset()
-	case MsgTypeCreateBearerRequest:
-		m.(*CreateBearerRequest).Reset()
-	case MsgTypeCreateBearerResponse:
-		m.(*CreateBearerResponse).Reset()
-	case MsgTypeModifyBearerRequest:
-		m.(*ModifyBearerRequest).Reset()
-	case MsgTypeReleaseAccessBearersRequest:
-		m.(*ReleaseAccessBearersRequest).Reset()
-	case MsgTypeReleaseAccessBearersResponse:
-		m.(*ReleaseAccessBearersResponse).Reset()
-	case MsgTypeDeleteSessionRequest:
-		m.(*DeleteSessionRequest).Reset()
-	case MsgTypeDeleteSessionResponse:
-		m.(*DeleteSessionResponse).Reset()
-	}
 }
 
 // Prettify returns a Message in prettified representation in string.

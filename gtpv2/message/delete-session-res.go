@@ -255,7 +255,6 @@ func (d *DeleteSessionResponse) UnmarshalBinary(b []byte) error {
 			d.AdditionalIEs = append(d.AdditionalIEs, i)
 		}
 	}
-	ie.ReleaseMultiParseContainer(decodedIEs)
 	return nil
 }
 
@@ -277,7 +276,6 @@ func (m *DeleteSessionResponse) Reset() {
 		PrivateExtension:              ie.Release(m.PrivateExtension),
 		AdditionalIEs:                 ie.ReleaseSlice(m.AdditionalIEs),
 	}
-	msgPool.releaseDeleteSessionResponse(m)
 }
 
 // MarshalLen returns the serial length in int.

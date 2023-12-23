@@ -558,7 +558,6 @@ func (m *ModifyBearerRequest) UnmarshalBinary(b []byte) error {
 			m.AdditionalIEs = append(m.AdditionalIEs, i)
 		}
 	}
-	ie.ReleaseMultiParseContainer(decodedIEs)
 	return nil
 }
 
@@ -603,7 +602,6 @@ func (m *ModifyBearerRequest) Reset() {
 		PrivateExtension:                       ie.Release(m.PrivateExtension),
 		AdditionalIEs:                          ie.ReleaseSlice(m.AdditionalIEs),
 	}
-	msgPool.releaseModifyBearerRequest(m)
 }
 
 // MarshalLen returns the serial length in int.

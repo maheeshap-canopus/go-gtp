@@ -241,7 +241,7 @@ func (i *IE) MarshalTo(b []byte) error {
 
 // Parse decodes given byte sequence as a GTPv2 Information Element.
 func Parse(b []byte) (*IE, error) {
-	ie := iePool.get()
+	ie := &IE{}
 	if err := ie.UnmarshalBinary(b); err != nil {
 		return nil, err
 	}
@@ -423,7 +423,7 @@ func (i *IE) FindByType(typ, instance uint8) (*IE, error) {
 // When you don't know the number of IEs, this is the only way to decode them.
 // See benchmarks in diameter_test.go for the detail.
 func ParseMultiIEs(b []byte) ([]*IE, error) {
-	var ies = sPool.get()
+	var ies []*IE
 	for {
 		if len(b) == 0 {
 			break
@@ -650,4 +650,12 @@ var ieTypeNameMap = map[uint8]string{
 	213: "SGiPtPTunnelAddress",
 	254: "SpecialIETypeForIETypeExtension",
 	255: "PrivateExtension",
+}
+
+func Release(i *IE) *IE {
+	return nil
+}
+
+func ReleaseSlice(s []*IE) []*IE {
+	return s[:0]
 }
