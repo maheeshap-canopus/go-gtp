@@ -47,6 +47,7 @@ type ModifyBearerRequest struct {
 	SecondaryRATUsageDataReport            []*ie.IE
 	PrivateExtension                       *ie.IE
 	AdditionalIEs                          []*ie.IE
+	multiParseContainer                    []*ie.IE
 }
 
 // NewModifyBearerRequest creates a new ModifyBearerRequest.
@@ -431,7 +432,10 @@ func ParseModifyBearerRequest(b []byte) (*ModifyBearerRequest, error) {
 // UnmarshalBinary decodes given bytes as ModifyBearerRequest.
 func (m *ModifyBearerRequest) UnmarshalBinary(b []byte) error {
 	var err error
-	m.Header, err = ParseHeader(b)
+	if m.Header == nil {
+		m.Header = &Header{}
+	}
+	err = m.Header.UnmarshalBinary(b)
 	if err != nil {
 		return err
 	}
@@ -439,12 +443,14 @@ func (m *ModifyBearerRequest) UnmarshalBinary(b []byte) error {
 		return nil
 	}
 
-	decodedIEs, err := ie.ParseMultiIEs(m.Header.Payload)
+	var parsed int
+	m.multiParseContainer, parsed, err = ie.ParseIntoMultiIEs(m.multiParseContainer, m.Header.Payload)
 	if err != nil {
 		return err
 	}
 
-	for _, i := range decodedIEs {
+	for idx := 0; idx < parsed; idx++ {
+		i := m.multiParseContainer[idx]
 		if i == nil {
 			continue
 		}
@@ -558,6 +564,7 @@ func (m *ModifyBearerRequest) UnmarshalBinary(b []byte) error {
 			m.AdditionalIEs = append(m.AdditionalIEs, i)
 		}
 	}
+
 	return nil
 }
 
@@ -601,6 +608,7 @@ func (m *ModifyBearerRequest) Reset() {
 		SecondaryRATUsageDataReport:            ie.ReleaseSlice(m.SecondaryRATUsageDataReport),
 		PrivateExtension:                       ie.Release(m.PrivateExtension),
 		AdditionalIEs:                          ie.ReleaseSlice(m.AdditionalIEs),
+		multiParseContainer:                    m.multiParseContainer,
 	}
 }
 

@@ -15,6 +15,7 @@ type ReleaseAccessBearersRequest struct {
 	SecondaryRATUsageDataReport []*ie.IE
 	PrivateExtension            *ie.IE
 	AdditionalIEs               []*ie.IE
+	multiParseContainer         []*ie.IE
 }
 
 // NewReleaseAccessBearersRequest creates a new ReleaseAccessBearersRequest.
@@ -124,7 +125,10 @@ func ParseReleaseAccessBearersRequest(b []byte) (*ReleaseAccessBearersRequest, e
 // UnmarshalBinary decodes given bytes as ReleaseAccessBearersRequest.
 func (r *ReleaseAccessBearersRequest) UnmarshalBinary(b []byte) error {
 	var err error
-	r.Header, err = ParseHeader(b)
+	if r.Header == nil {
+		r.Header = &Header{}
+	}
+	err = r.Header.UnmarshalBinary(b)
 	if err != nil {
 		return err
 	}
@@ -132,11 +136,14 @@ func (r *ReleaseAccessBearersRequest) UnmarshalBinary(b []byte) error {
 		return nil
 	}
 
-	decodedIEs, err := ie.ParseMultiIEs(r.Header.Payload)
+	var parsed int
+	r.multiParseContainer, parsed, err = ie.ParseIntoMultiIEs(r.multiParseContainer, r.Header.Payload)
 	if err != nil {
 		return err
 	}
-	for _, i := range decodedIEs {
+
+	for idx := 0; idx < parsed; idx++ {
+		i := r.multiParseContainer[idx]
 		if i == nil {
 			continue
 		}
@@ -155,6 +162,7 @@ func (r *ReleaseAccessBearersRequest) UnmarshalBinary(b []byte) error {
 			r.AdditionalIEs = append(r.AdditionalIEs, i)
 		}
 	}
+
 	return nil
 }
 
@@ -168,6 +176,7 @@ func (m *ReleaseAccessBearersRequest) Reset() {
 		SecondaryRATUsageDataReport: ie.ReleaseSlice(m.SecondaryRATUsageDataReport),
 		PrivateExtension:            ie.Release(m.PrivateExtension),
 		AdditionalIEs:               ie.ReleaseSlice(m.AdditionalIEs),
+		multiParseContainer:         m.multiParseContainer,
 	}
 }
 

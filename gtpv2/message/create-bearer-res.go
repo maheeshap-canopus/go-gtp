@@ -35,6 +35,7 @@ type CreateBearerResponse struct {
 	UETCPPort                          *ie.IE
 	PrivateExtension                   *ie.IE
 	AdditionalIEs                      []*ie.IE
+	multiParseContainer                []*ie.IE
 }
 
 // NewCreateBearerResponse creates a new CreateBearerResponse.
@@ -316,7 +317,10 @@ func ParseCreateBearerResponse(b []byte) (*CreateBearerResponse, error) {
 // UnmarshalBinary decodes given bytes as CreateBearerResponse.
 func (c *CreateBearerResponse) UnmarshalBinary(b []byte) error {
 	var err error
-	c.Header, err = ParseHeader(b)
+	if c.Header == nil {
+		c.Header = &Header{}
+	}
+	err = c.Header.UnmarshalBinary(b)
 	if err != nil {
 		return err
 	}
@@ -324,12 +328,14 @@ func (c *CreateBearerResponse) UnmarshalBinary(b []byte) error {
 		return nil
 	}
 
-	decodedIEs, err := ie.ParseMultiIEs(c.Header.Payload)
+	var parsed int
+	c.multiParseContainer, parsed, err = ie.ParseIntoMultiIEs(c.multiParseContainer, c.Header.Payload)
 	if err != nil {
 		return err
 	}
 
-	for _, i := range decodedIEs {
+	for idx := 0; idx < parsed; idx++ {
+		i := c.multiParseContainer[idx]
 		if i == nil {
 			continue
 		}
@@ -402,6 +408,7 @@ func (c *CreateBearerResponse) UnmarshalBinary(b []byte) error {
 			c.AdditionalIEs = append(c.AdditionalIEs, i)
 		}
 	}
+
 	return nil
 }
 
@@ -433,6 +440,7 @@ func (m *CreateBearerResponse) Reset() {
 		UETCPPort:                          ie.Release(m.UETCPPort),
 		PrivateExtension:                   ie.Release(m.PrivateExtension),
 		AdditionalIEs:                      ie.ReleaseSlice(m.AdditionalIEs),
+		multiParseContainer:                m.multiParseContainer,
 	}
 }
 

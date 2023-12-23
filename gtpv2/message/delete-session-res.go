@@ -24,6 +24,7 @@ type DeleteSessionResponse struct {
 	APNRateControlStatus          *ie.IE
 	PrivateExtension              *ie.IE
 	AdditionalIEs                 []*ie.IE
+	multiParseContainer           []*ie.IE
 }
 
 // NewDeleteSessionResponse creates a new DeleteSessionResponse.
@@ -199,7 +200,10 @@ func ParseDeleteSessionResponse(b []byte) (*DeleteSessionResponse, error) {
 // UnmarshalBinary decodes given bytes as DeleteSessionResponse.
 func (d *DeleteSessionResponse) UnmarshalBinary(b []byte) error {
 	var err error
-	d.Header, err = ParseHeader(b)
+	if d.Header == nil {
+		d.Header = &Header{}
+	}
+	err = d.Header.UnmarshalBinary(b)
 	if err != nil {
 		return err
 	}
@@ -207,12 +211,14 @@ func (d *DeleteSessionResponse) UnmarshalBinary(b []byte) error {
 		return nil
 	}
 
-	decodedIEs, err := ie.ParseMultiIEs(d.Header.Payload)
+	var parsed int
+	d.multiParseContainer, parsed, err = ie.ParseIntoMultiIEs(d.multiParseContainer, d.Header.Payload)
 	if err != nil {
 		return err
 	}
 
-	for _, i := range decodedIEs {
+	for idx := 0; idx < parsed; idx++ {
+		i := d.multiParseContainer[idx]
 		if i == nil {
 			continue
 		}
@@ -255,6 +261,7 @@ func (d *DeleteSessionResponse) UnmarshalBinary(b []byte) error {
 			d.AdditionalIEs = append(d.AdditionalIEs, i)
 		}
 	}
+
 	return nil
 }
 
@@ -275,6 +282,7 @@ func (m *DeleteSessionResponse) Reset() {
 		APNRateControlStatus:          ie.Release(m.APNRateControlStatus),
 		PrivateExtension:              ie.Release(m.PrivateExtension),
 		AdditionalIEs:                 ie.ReleaseSlice(m.AdditionalIEs),
+		multiParseContainer:           m.multiParseContainer,
 	}
 }
 

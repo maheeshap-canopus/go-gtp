@@ -445,6 +445,7 @@ func (m *ModifyBearerResponse) UnmarshalBinary(b []byte) error {
 			m.AdditionalIEs = append(m.AdditionalIEs, i)
 		}
 	}
+
 	return nil
 }
 

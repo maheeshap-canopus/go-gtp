@@ -16,6 +16,7 @@ type ReleaseAccessBearersResponse struct {
 	SGWOverloadControlInformation *ie.IE
 	PrivateExtension              *ie.IE
 	AdditionalIEs                 []*ie.IE
+	multiParseContainer           []*ie.IE
 }
 
 // NewReleaseAccessBearersResponse creates a new ReleaseAccessBearersResponse.
@@ -133,7 +134,10 @@ func ParseReleaseAccessBearersResponse(b []byte) (*ReleaseAccessBearersResponse,
 // UnmarshalBinary decodes given bytes as ReleaseAccessBearersResponse.
 func (r *ReleaseAccessBearersResponse) UnmarshalBinary(b []byte) error {
 	var err error
-	r.Header, err = ParseHeader(b)
+	if r.Header == nil {
+		r.Header = &Header{}
+	}
+	err = r.Header.UnmarshalBinary(b)
 	if err != nil {
 		return err
 	}
@@ -141,11 +145,14 @@ func (r *ReleaseAccessBearersResponse) UnmarshalBinary(b []byte) error {
 		return nil
 	}
 
-	decodedIEs, err := ie.ParseMultiIEs(r.Header.Payload)
+	var parsed int
+	r.multiParseContainer, parsed, err = ie.ParseIntoMultiIEs(r.multiParseContainer, r.Header.Payload)
 	if err != nil {
 		return err
 	}
-	for _, i := range decodedIEs {
+
+	for idx := 0; idx < parsed; idx++ {
+		i := r.multiParseContainer[idx]
 		if i == nil {
 			continue
 		}
@@ -166,6 +173,7 @@ func (r *ReleaseAccessBearersResponse) UnmarshalBinary(b []byte) error {
 			r.AdditionalIEs = append(r.AdditionalIEs, i)
 		}
 	}
+
 	return nil
 }
 
@@ -180,6 +188,7 @@ func (m *ReleaseAccessBearersResponse) Reset() {
 		SGWOverloadControlInformation: ie.Release(m.SGWOverloadControlInformation),
 		PrivateExtension:              ie.Release(m.PrivateExtension),
 		AdditionalIEs:                 ie.ReleaseSlice(m.AdditionalIEs),
+		multiParseContainer:           m.multiParseContainer,
 	}
 }
 

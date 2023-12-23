@@ -77,6 +77,7 @@ type CreateSessionRequest struct {
 	APNRateControlStatus               *ie.IE
 	PrivateExtension                   *ie.IE
 	AdditionalIEs                      []*ie.IE
+	multiParseContainer                []*ie.IE
 }
 
 // NewCreateSessionRequest creates a new CreateSessionRequest.
@@ -708,7 +709,10 @@ func ParseCreateSessionRequest(b []byte) (*CreateSessionRequest, error) {
 // UnmarshalBinary decodes given bytes as CreateSessionRequest.
 func (c *CreateSessionRequest) UnmarshalBinary(b []byte) error {
 	var err error
-	c.Header, err = ParseHeader(b)
+	if c.Header == nil {
+		c.Header = &Header{}
+	}
+	err = c.Header.UnmarshalBinary(b)
 	if err != nil {
 		return err
 	}
@@ -716,12 +720,14 @@ func (c *CreateSessionRequest) UnmarshalBinary(b []byte) error {
 		return nil
 	}
 
-	decodedIEs, err := ie.ParseMultiIEs(c.Header.Payload)
+	var parsed int
+	c.multiParseContainer, parsed, err = ie.ParseIntoMultiIEs(c.multiParseContainer, c.Header.Payload)
 	if err != nil {
 		return err
 	}
 
-	for _, i := range decodedIEs {
+	for idx := 0; idx < parsed; idx++ {
+		i := c.multiParseContainer[idx]
 		if i == nil {
 			continue
 		}
@@ -905,6 +911,7 @@ func (c *CreateSessionRequest) UnmarshalBinary(b []byte) error {
 			c.AdditionalIEs = append(c.AdditionalIEs, i)
 		}
 	}
+
 	return nil
 }
 
@@ -978,6 +985,7 @@ func (m *CreateSessionRequest) Reset() {
 		APNRateControlStatus:               ie.Release(m.APNRateControlStatus),
 		PrivateExtension:                   ie.Release(m.PrivateExtension),
 		AdditionalIEs:                      ie.ReleaseSlice(m.AdditionalIEs),
+		multiParseContainer:                m.multiParseContainer,
 	}
 }
 
